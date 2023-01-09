@@ -4,6 +4,7 @@ FILENAME = "projects.txt"
 
 
 def main():
+    """Display main function of Project Management program."""
     MENU = "Menu:\n-(L)oad projects\n-(S)ave projects\n-(D)isplay projects\n-(F)ilter projects by date\n" \
            "-(A)dd new project\n-(U)pdate project\n(Q)uit"
     projects = get_file(FILENAME)
@@ -76,6 +77,7 @@ def main():
 
 
 def get_file(filename):
+    """Read file of project details."""
     projects = []
     in_file = open(filename, 'r')
     in_file.readline()
@@ -89,6 +91,7 @@ def get_file(filename):
 
 
 def save_file(filename, projects):
+    """Save new project to the file."""
     with open(filename, "w") as out_file:
         for project in projects:
             print(f"{project.name}\t{project.start_date}\t{project.priority}\t{project.cost}\t{project.completion}",
@@ -96,11 +99,13 @@ def save_file(filename, projects):
 
 
 def display_project(projects):
+    """Display the project file."""
     for number, project in enumerate(projects):
         print(f"{number + 1} {project}")
 
 
 def check_project(projects):
+    """Check the project is completed or not."""
     complete_projects = []
     incomplete_projects = []
     for project in projects:
