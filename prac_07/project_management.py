@@ -2,6 +2,7 @@ from prac_07.project import Project
 
 FILENAME = "projects.txt"
 
+
 def main():
     MENU = "Menu:\n(L)oad projects\n(S)ave projects\n(D)isplay projects\n(F)ilter projects by date\n" \
            "(A)dd new project\n(U)pdate project\n(Q)uit"
@@ -11,11 +12,28 @@ def main():
     choice = input(">>> ").upper()
     while choice != "Q":
         if choice == "L":
-            pass
+            filename = input("Enter filename: ")
+            if filename != "":
+                try:
+                    projects = get_file(filename)
+                    print(projects)
+                except FileNotFoundError:
+                    print("Invalid Filename!")
+
         elif choice == "S":
-            pass
+            filename = input("Enter filename to be saved: ")
+            save_file(filename, projects)
+
         elif choice == "D":
-            pass
+            complete_project, incomplete_project = check_project(projects)
+            print("Incomplete projects: ")
+            incomplete_project.sort()
+            display_project(incomplete_project)
+            print("")
+            print("Completed projects: ")
+            complete_project.sort()
+            display_project(complete_project)
+
         elif choice == "F":
             pass
         elif choice == "A":
@@ -42,10 +60,29 @@ def get_file(filename):
     return projects
 
 
+def save_file(filename, projects):
+    with open(filename, "w") as out_file:
+        for project in projects:
+            print(f"{project.name}\t{project.start_date}\t{project.priority}\t{project.cost}\t{project.completion}",
+                  file=out_file)
 
 
+def display_project(projects):
+    for number, project in enumerate(projects):
+        print(f"{number + 1} {project}")
 
 
+def check_project(projects):
+    complete_project = []
+    incomplete_project = []
+    for project in projects:
+        if project.is_complete():
+            complete_project.append(project)
+            complete_project.sort()
+        else:
+            incomplete_project.append(project)
+            incomplete_project.sort()
+    return complete_project, incomplete_project
 
 
 main()
