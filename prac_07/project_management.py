@@ -4,10 +4,9 @@ FILENAME = "projects.txt"
 
 
 def main():
-    MENU = "Menu:\n(L)oad projects\n(S)ave projects\n(D)isplay projects\n(F)ilter projects by date\n" \
-           "(A)dd new project\n(U)pdate project\n(Q)uit"
+    MENU = "Menu:\n-(L)oad projects\n-(S)ave projects\n-(D)isplay projects\n-(F)ilter projects by date\n" \
+           "-(A)dd new project\n-(U)pdate project\n(Q)uit"
     projects = get_file(FILENAME)
-    print(projects)
     print(MENU)
     choice = input(">>> ").upper()
     while choice != "Q":
@@ -19,30 +18,60 @@ def main():
                     print(projects)
                 except FileNotFoundError:
                     print("Invalid Filename!")
-
         elif choice == "S":
             filename = input("Enter filename to be saved: ")
             save_file(filename, projects)
-
         elif choice == "D":
             complete_project, incomplete_project = check_project(projects)
             print("Incomplete projects: ")
             incomplete_project.sort()
             display_project(incomplete_project)
-            print("")
             print("Completed projects: ")
             complete_project.sort()
             display_project(complete_project)
-
         elif choice == "F":
-            pass
+            date = input("Show projects that start after date (dd/mm/yy): ")
+            filtered_date_projects = filtered_projects(date, projects)
+            projects = sort_projects(filtered_date_projects)
+            display_project(projects)
         elif choice == "A":
-            pass
+            print("Lets add a new project")
+            try:
+                name = input("Name: ")
+                start_date = input("Start date (dd/mm/yy): ")
+                priority = int(input("Priority: "))
+                cost = input("Cost estimate: ")
+                cost = cost.replace("$", ",")
+                cost = int(cost)
+                completion = input("Percent complete: ")
+                project = Project(str(name), str(start_date), int(priority), int(cost), int(completion))
+                projects.append(project)
+            except ValueError:
+                print("Invalid Input! ")
         elif choice == "U":
-            pass
+            projects = sort_projects(projects)
+            projects.sort()
+            display_project(projects)
+
+            projects_number = {}
+            for number, project in enumerate(projects):
+                projects_number[str(number + 1)] = project
+            try:
+                choice = input("Project choice: ")
+                chosen_project = projects_number[choice]
+                print(chosen_project)
+                new_percentage = input("New Percentage: ")
+                new_priority = input("New Priority: ")
+                if new_percentage != "":
+                    chosen_project.update_percentage(int(new_percentage))
+                if new_priority != "":
+                    chosen_project.update_priority(int(new_priority))
+            except KeyError:
+                print("Invalid Choice!")
         else:
             print("Invalid menu choice!")
-            choice = input(">>> ").upper()
+        print(MENU)
+        choice = input(">>> ").upper()
     print("Thank you for using custom-built project management software.")
 
 
@@ -53,7 +82,6 @@ def get_file(filename):
     for line in in_file:
         parts = line.strip().replace("\t", ",")
         parts = parts.split(",")
-        print(parts)
         project = Project(parts[0], parts[1], int(parts[2]), float(parts[3]), int(parts[4]))
         projects.append(project)
     in_file.close()
@@ -73,16 +101,38 @@ def display_project(projects):
 
 
 def check_project(projects):
-    complete_project = []
-    incomplete_project = []
+    complete_projects = []
+    incomplete_projects = []
     for project in projects:
         if project.is_complete():
-            complete_project.append(project)
-            complete_project.sort()
+            complete_projects.append(project)
+            complete_projects.sort()
         else:
-            incomplete_project.append(project)
-            incomplete_project.sort()
-    return complete_project, incomplete_project
+            incomplete_projects.append(project)
+            incomplete_projects.sort()
+    return complete_projects, incomplete_projects
+
+
+def filtered_projects(date, projects):
+    filtered_projects_date = []
+    for project in projects:
+        if project.compare_date(date):
+            filtered_projects_date.append(project)
+    return filtered_projects_date
+
+
+def sort_projects(projects):
+    date_list = []
+    for project in projects:
+        if project.start_date not in date_list:
+            date_list.append(project.start_date)
+    date_list.sort()
+    sorted_project = []
+    for date in date_list:
+        for number, project in enumerate(projects):
+            if project.start_date == date:
+                sorted_project.append(project)
+    return sorted_project
 
 
 main()
