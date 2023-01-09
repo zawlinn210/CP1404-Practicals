@@ -21,5 +21,16 @@ def main():
         guitars.sort()
         print(guitar)
 
+    name = input("Enter guitar name: ")
+    year = int(input("Enter year: "))
+    price = float(input("Enter price: "))
+    write_to_file(name, price, year)
+
+
+def write_to_file(name, price, year):
+    """Write new guitars to file."""
+    with open("guitars.csv", "a") as out_file:
+        print(f"{name},{year},{price:.2f}", file=out_file)
+
 
 main()
